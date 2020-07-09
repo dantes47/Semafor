@@ -5,12 +5,14 @@ import android.app.Activity
 import android.view.View
 import android.widget.ImageButton
 import android.widget.ImageView
-import kotlinx.android.synthetic.main.activity_main.*
-
+import java.util.*
 
 class MainActivity : Activity() {
-    private var imgSemafor: ImageView? = null
-    var imgArray: IntArray = intArrayOf(
+    var imgSemafor: ImageView? = null
+    var i: Int = 0
+    var timer: Timer? = null
+    var isRun = false
+    var imgArray: IntArray = intArrayOf (
         R.drawable.semafor_red,
         R.drawable.semafor_yellow,
         R.drawable.semafor_green
@@ -21,12 +23,39 @@ class MainActivity : Activity() {
         setContentView(R.layout.activity_main)
 
         imgSemafor = findViewById(R.id.imgSemafor)
-        imgSemafor?.setImageResource(imgArray[0])
     }
 
     fun onClickRunStop(view: View) {
+
         // making a cast
         view as ImageButton
-        view.setImageResource(R.drawable.button_stop)
+        if(!isRun) {
+
+            runStop()
+            view.setImageResource(R.drawable.button_stop)
+            isRun = true
+        } else {
+            imgSemafor?.setImageResource(R.drawable.semafor_grey)
+            view.setImageResource(R.drawable.button_start)
+            timer?.cancel()
+            isRun = false
+            i = 0
+        }
+
     }
+        fun runStop() {
+                timer = Timer()
+                timer?.schedule(object : TimerTask() {
+                    override fun run() {
+
+                        // adding path to main thread for proper running
+                        runOnUiThread() {
+                            imgSemafor?.setImageResource(imgArray[i])
+                            i++
+                            if (i == 3) i = 0
+                        }
+                    }
+
+                }, 0, 1000)
+        }
 }
